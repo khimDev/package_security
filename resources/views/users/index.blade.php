@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Petugas | Package Security</title>
 
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
 
@@ -20,7 +23,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="brand">
                 <div class="brand-info">
-                    <div class="brand-icon">P</div>
+                    <img src="{{ asset('images/logo.svg') }}" alt="Logo Package Security" class="brand-logo">
                     <div>
                         <h2>Package Security</h2>
                         <span>Security Management</span>
