@@ -57,3 +57,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 
 });
+
+// Serving file public storage secara langsung (fallback jika symlink tidak didukung oleh runtime Wasmer Edge)
+Route::get('/storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+
+    return response()->file($filePath);
+})->where('path', '.*');
