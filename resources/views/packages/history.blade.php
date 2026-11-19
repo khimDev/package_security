@@ -174,9 +174,9 @@
 
                                     <td>
                                         @if ($package->pickup && $package->pickup->signature_path)
-                                            <a href="{{ asset('storage/' . $package->pickup->signature_path) }}" target="_blank" title="Klik untuk perbesar tanda tangan">
+                                            <a href="{{ url('/files/' . $package->pickup->signature_path) }}" target="_blank" title="Klik untuk perbesar tanda tangan">
                                                 <img
-                                                    src="{{ asset('storage/' . $package->pickup->signature_path) }}"
+                                                    src="{{ url('/files/' . $package->pickup->signature_path) }}"
                                                     alt="Tanda Tangan"
                                                     class="table-signature-thumb"
                                                 >

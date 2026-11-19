@@ -58,11 +58,30 @@ Route::middleware('auth')->group(function () {
 
 });
 
-// Serving file public storage secara langsung (fallback jika symlink tidak didukung oleh runtime Wasmer Edge)
-Route::get('/storage/{path}', function ($path) {
+// Serving file storage secara aman via route Laravel (membypass blokade symlink pada php -S di Wasmer Edge)
+Route::get('/files/{path}', function ($path) {
+    // Keamanan: cegah directory traversal
+    if (str_contains($path, '..')) {
+        abort(403, 'Akses tidak sah.');
+    }
+
     $filePath = storage_path('app/public/' . $path);
 
-    if (!file_exists($filePath)) {
+    if (!file_exists($filePath) || !is_file($filePath)) {
+        abort(404);
+    }
+
+    return response()->file($filePath);
+})->where('path', '.*')->name('files.show');
+
+Route::get('/storage/{path}', function ($path) {
+    if (str_contains($path, '..')) {
+        abort(403, 'Akses tidak sah.');
+    }
+
+    $filePath = storage_path('app/public/' . $path);
+
+    if (!file_exists($filePath) || !is_file($filePath)) {
         abort(404);
     }
 

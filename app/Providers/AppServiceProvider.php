@@ -42,5 +42,17 @@ class AppServiceProvider extends ServiceProvider
         } catch (Throwable $e) {
             // Diamkan agar tidak crash jika database belum siap
         }
+
+        // Hapus symlink/folder public/storage jika terdeteksi agar tidak diblokir oleh php -S di Wasmer Edge
+        try {
+            $storageLink = public_path('storage');
+            if (is_link($storageLink)) {
+                @unlink($storageLink);
+            } elseif (is_dir($storageLink)) {
+                @rmdir($storageLink);
+            }
+        } catch (Throwable $e) {
+            // Diamkan agar tidak mengganggu booting aplikasi
+        }
     }
 }

@@ -89,7 +89,7 @@
                         <label>Tanda Tangan Digital Pengambil</label>
                         <div class="signature-preview-box">
                             <img
-                                src="{{ asset('storage/' . $package->pickup->signature_path) }}"
+                                src="{{ url('/files/' . $package->pickup->signature_path) }}"
                                 alt="Tanda Tangan {{ $package->pickup->taker_name }}"
                                 class="signature-preview-img"
                             >
