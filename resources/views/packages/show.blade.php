@@ -88,11 +88,20 @@
                     <div class="detail-item">
                         <label>Tanda Tangan Digital Pengambil</label>
                         <div class="signature-preview-box">
+                            @php
+                                $sigSrc = \Illuminate\Support\Str::startsWith($package->pickup->signature_path, 'data:image/')
+                                    ? $package->pickup->signature_path
+                                    : url('/files/' . $package->pickup->signature_path);
+                            @endphp
                             <img
-                                src="{{ url('/files/' . $package->pickup->signature_path) }}"
+                                src="{{ $sigSrc }}"
                                 alt="Tanda Tangan {{ $package->pickup->taker_name }}"
                                 class="signature-preview-img"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                             >
+                            <p style="display: none; font-size: 13px; color: #94a3b8; padding: 12px 0;">
+                                (File tanda tangan lama tidak tersedia)
+                            </p>
                         </div>
                     </div>
                 </div>

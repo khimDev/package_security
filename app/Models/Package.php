@@ -34,8 +34,12 @@ class Package extends Model
         foreach ($expiredPackages as $package) {
             DB::transaction(function () use ($package) {
                 if ($package->pickup) {
-                    // Hapus file fisik gambar tanda tangan dari storage jika ada
-                    if ($package->pickup->signature_path && Storage::disk('public')->exists($package->pickup->signature_path)) {
+                    // Hapus file fisik gambar tanda tangan dari storage jika data lama berupa file path
+                    if (
+                        $package->pickup->signature_path &&
+                        !str_starts_with($package->pickup->signature_path, 'data:image/') &&
+                        Storage::disk('public')->exists($package->pickup->signature_path)
+                    ) {
                         Storage::disk('public')->delete($package->pickup->signature_path);
                     }
                     $package->pickup->delete();

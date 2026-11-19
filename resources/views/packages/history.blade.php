@@ -174,12 +174,19 @@
 
                                     <td>
                                         @if ($package->pickup && $package->pickup->signature_path)
-                                            <a href="{{ url('/files/' . $package->pickup->signature_path) }}" target="_blank" title="Klik untuk perbesar tanda tangan">
+                                            @php
+                                                $sigSrc = \Illuminate\Support\Str::startsWith($package->pickup->signature_path, 'data:image/')
+                                                    ? $package->pickup->signature_path
+                                                    : url('/files/' . $package->pickup->signature_path);
+                                            @endphp
+                                            <a href="{{ $sigSrc }}" target="_blank" title="Klik untuk perbesar tanda tangan">
                                                 <img
-                                                    src="{{ url('/files/' . $package->pickup->signature_path) }}"
+                                                    src="{{ $sigSrc }}"
                                                     alt="Tanda Tangan"
                                                     class="table-signature-thumb"
+                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"
                                                 >
+                                                <span class="text-muted" style="display: none; font-size: 11px;">[Tidak tersedia]</span>
                                             </a>
                                         @else
                                             <span class="text-muted">-</span>

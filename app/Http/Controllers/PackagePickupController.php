@@ -43,40 +43,16 @@ class PackagePickupController extends Controller
             'signature_data.starts_with' => 'Format tanda tangan digital tidak valid.',
         ]);
 
-        // 3. Ekstrak dan decode file gambar dari string Base64
+        // 3. Simpan data tanda tangan Base64 langsung ke database MySQL (permanen untuk stateless runtime seperti Wasmer Edge)
         $signatureData = $request->input('signature_data');
-        $imageParts = explode(';base64,', $signatureData);
 
-        if (count($imageParts) < 2) {
-            return back()
-                ->withInput()
-                ->withErrors(['signature_data' => 'Format gambar tanda tangan tidak valid.']);
-        }
-
-        $imageBase64 = base64_decode($imageParts[1]);
-
-        if (!$imageBase64) {
-            return back()
-                ->withInput()
-                ->withErrors(['signature_data' => 'Gagal memproses tanda tangan digital.']);
-        }
-
-        // 4. Pastikan direktori signatures ada di public storage
-        if (!Storage::disk('public')->exists('signatures')) {
-            Storage::disk('public')->makeDirectory('signatures');
-        }
-
-        // 5. Generate nama file unik & simpan ke storage
-        $fileName = 'signatures/signature_' . $package->id . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.png';
-        Storage::disk('public')->put($fileName, $imageBase64);
-
-        // 6. Simpan catatan pengambilan ke database dengan transaksi
-        DB::transaction(function () use ($package, $request, $fileName) {
+        // 4. Simpan catatan pengambilan ke database dengan transaksi
+        DB::transaction(function () use ($package, $request, $signatureData) {
             PackagePickup::create([
                 'package_id' => $package->id,
                 'taker_name' => trim($request->input('taker_name')),
                 'served_by' => auth()->id(), // Otomatis dari ID satpam yang login
-                'signature_path' => $fileName,
+                'signature_path' => $signatureData,
                 'picked_up_at' => now(),     // Waktu server (WIB)
             ]);
         });
