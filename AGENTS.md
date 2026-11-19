@@ -285,11 +285,11 @@ erDiagram
   -----------------------------------------------------------------------
   Teknologi               Versi/keterangan        Kegunaan
   ----------------------- ----------------------- -----------------------
-  PHP                     8.5.12 (lingkungan yang Backend
-                          dilaporkan)             
+  PHP                     8.3.29 (Wasmer runtime) Backend
+                          / 8.5.x (Lokal)         
 
-  Laravel                 13.42.0 (versi yang     Framework backend
-                          dilaporkan)             
+  Laravel                 12.73.0 (kompatibel     Framework backend
+                          Symfony 7 & PHP 8.3)    
 
   MySQL                   8.4.3 (versi yang       Database
                           dilaporkan)             
