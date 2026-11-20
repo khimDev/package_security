@@ -178,8 +178,14 @@
                                                 $sigSrc = \Illuminate\Support\Str::startsWith($package->pickup->signature_path, 'data:image/')
                                                     ? $package->pickup->signature_path
                                                     : url('/files/' . $package->pickup->signature_path);
+                                                $takerName = $package->pickup->taker_name ?? '-';
+                                                $pickupTime = $package->pickup->picked_up_at ? $package->pickup->picked_up_at->format('d/m/Y H:i') . ' WIB' : '-';
                                             @endphp
-                                            <a href="{{ $sigSrc }}" target="_blank" title="Klik untuk perbesar tanda tangan">
+                                            <div
+                                                onclick="openSignatureModal('{{ addslashes($sigSrc) }}', '{{ addslashes($takerName) }}', '{{ addslashes($pickupTime) }}')"
+                                                title="Klik untuk melihat pratinjau tanda tangan"
+                                                style="display: inline-block; cursor: pointer;"
+                                            >
                                                 <img
                                                     src="{{ $sigSrc }}"
                                                     alt="Tanda Tangan"
@@ -187,7 +193,7 @@
                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"
                                                 >
                                                 <span class="text-muted" style="display: none; font-size: 11px;">[Tidak tersedia]</span>
-                                            </a>
+                                            </div>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
@@ -225,8 +231,43 @@
 
     </div>
 
-    <!-- Script Drawer Sidebar Mobile -->
+    <!-- Modal Preview Tanda Tangan (Lightbox Canvas Putih) -->
+    <div id="signatureModal" class="modal-overlay" style="z-index: 99999;">
+        <div class="modal-card" style="max-width: 520px; text-align: center; border-radius: 16px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <div class="modal-header" style="margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="text-align: left;">
+                    <h3 style="font-size: 17px; color: #1e293b; margin: 0 0 2px 0;">Bukti Tanda Tangan</h3>
+                    <p style="font-size: 12px; color: #64748b; margin: 0;">Pratinjau tanda tangan serah terima paket</p>
+                </div>
+                <button type="button" class="btn-close" onclick="closeSignatureModal()" aria-label="Tutup">&times;</button>
+            </div>
+
+            <!-- Canvas Kotak Putih Bersih dengan Border Halus -->
+            <div style="background: #ffffff; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: center; min-height: 200px; max-height: 320px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 16px; overflow: hidden;">
+                <img id="modalSignatureImg" src="" alt="Pratinjau Tanda Tangan" style="max-width: 100%; max-height: 280px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));">
+            </div>
+
+            <!-- Info Penerima & Waktu -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; text-align: left; margin-bottom: 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 600;">Nama Pengambil</span>
+                    <strong id="modalSignatureRecipient" style="font-size: 14px; color: #1e293b;">-</strong>
+                </div>
+                <div>
+                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 600;">Waktu Pengambilan</span>
+                    <span id="modalSignatureTime" style="font-size: 13px; color: #334155;">-</span>
+                </div>
+            </div>
+
+            <button type="button" class="primary-button" onclick="closeSignatureModal()" style="width: 100%; padding: 11px; background: #334155; border-radius: 8px; font-weight: 600;">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Script Drawer Sidebar & Modal Lightbox -->
     <script>
+        // Drawer Sidebar Mobile
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const btnToggleSidebar = document.getElementById('btnToggleSidebar');
@@ -267,6 +308,48 @@
         if (sidebarOverlay) {
             sidebarOverlay.addEventListener('click', closeSidebar);
         }
+
+        // Modal Lightbox Preview Tanda Tangan
+        const signatureModal = document.getElementById('signatureModal');
+        const modalSignatureImg = document.getElementById('modalSignatureImg');
+        const modalSignatureRecipient = document.getElementById('modalSignatureRecipient');
+        const modalSignatureTime = document.getElementById('modalSignatureTime');
+
+        function openSignatureModal(src, recipientName, time) {
+            if (modalSignatureImg) modalSignatureImg.src = src;
+            if (modalSignatureRecipient) modalSignatureRecipient.textContent = recipientName;
+            if (modalSignatureTime) modalSignatureTime.textContent = time;
+
+            if (signatureModal) {
+                signatureModal.classList.add('active');
+                signatureModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeSignatureModal() {
+            if (signatureModal) {
+                signatureModal.classList.remove('active');
+                signatureModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Tutup saat klik di area gelap di luar modal
+        if (signatureModal) {
+            signatureModal.addEventListener('click', function(e) {
+                if (e.target === signatureModal) {
+                    closeSignatureModal();
+                }
+            });
+        }
+
+        // Tutup saat menekan tombol Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && signatureModal && signatureModal.classList.contains('active')) {
+                closeSignatureModal();
+            }
+        });
     </script>
 
 </body>

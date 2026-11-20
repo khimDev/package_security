@@ -967,12 +967,14 @@ th, td {
         border-radius: 6px;
         padding: 2px 4px;
         display: block;
-        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     }
 
     .table-signature-thumb:hover {
-        transform: scale(1.15);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: scale(1.12);
+        border-color: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
 
     /* Topbar Layout & Tombol Hamburger */

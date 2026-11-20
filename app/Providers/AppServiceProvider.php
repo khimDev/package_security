@@ -31,16 +31,18 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Otomatis migrate & seed jika tabel users belum ada (untuk runtime Wasmer Edge / Serverless)
-        try {
-            if (!Schema::hasTable('users')) {
-                Artisan::call('migrate', [
-                    '--seed' => true,
-                    '--force' => true,
-                ]);
+        // Otomatis migrate & seed jika tabel users belum ada (khusus saat menerima request HTTP di runtime Wasmer Edge)
+        if (!app()->runningInConsole()) {
+            try {
+                if (!Schema::hasTable('users')) {
+                    Artisan::call('migrate', [
+                        '--seed' => true,
+                        '--force' => true,
+                    ]);
+                }
+            } catch (Throwable $e) {
+                // Diamkan agar tidak crash jika database belum siap
             }
-        } catch (Throwable $e) {
-            // Diamkan agar tidak crash jika database belum siap
         }
 
         // Hapus symlink/folder public/storage jika terdeteksi agar tidak diblokir oleh php -S di Wasmer Edge
