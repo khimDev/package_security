@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::post('/users/reset-testing-data', [UserController::class, 'resetTestingData'])->name('users.reset-testing');
         Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });

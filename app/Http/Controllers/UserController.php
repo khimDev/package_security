@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Package;
+use App\Models\PackagePickup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -94,5 +97,46 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->back()->with('success', "Akun petugas {$nama} berhasil dihapus.");
+    }
+
+    /**
+     * Bersihkan seluruh data paket & pickup testing, lalu daftarkan 7 akun satpam resmi kampus
+     */
+    public function resetTestingData()
+    {
+        DB::transaction(function () {
+            // 1. Bersihkan seluruh data paket dan riwayat pickup
+            PackagePickup::query()->delete();
+            Package::query()->delete();
+
+            // 2. Bersihkan akun satpam testing lama (selain akun admin yang sedang login)
+            User::where('id', '!=', auth()->id())
+                ->where('is_admin', false)
+                ->delete();
+
+            // 3. Daftarkan 7 akun satpam resmi Universitas Widyagama Husada Malang
+            $officialSatpams = [
+                ['name' => 'LINDUNG AGUNG', 'username' => 'lindung'],
+                ['name' => 'FERY', 'username' => 'fery'],
+                ['name' => 'RISKY N', 'username' => 'risky_n'],
+                ['name' => 'RISKY SAIFUL', 'username' => 'risky_saiful'],
+                ['name' => 'AMIN', 'username' => 'amin'],
+                ['name' => 'FRANDY', 'username' => 'frandy'],
+                ['name' => 'RAHMAD', 'username' => 'rahmad'],
+            ];
+
+            foreach ($officialSatpams as $satpam) {
+                User::updateOrCreate(
+                    ['username' => $satpam['username']],
+                    [
+                        'name' => $satpam['name'],
+                        'password' => 'satpam123',
+                        'is_admin' => false,
+                    ]
+                );
+            }
+        });
+
+        return redirect()->route('users.index')->with('success', 'Database berhasil dibersihkan! 7 akun satpam resmi kampus telah siap digunakan.');
     }
 }

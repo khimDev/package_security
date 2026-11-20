@@ -125,9 +125,18 @@
                     <p>Total {{ $users->total() }} akun terdaftar dalam sistem.</p>
                 </div>
 
-                <button type="button" class="primary-button" id="btnOpenAddModal">
-                    + Tambah Petugas
-                </button>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <form action="{{ route('users.reset-testing') }}" method="POST" onsubmit="return confirm('PERINGATAN: Aksi ini akan menghapus seluruh data paket & riwayat testing, lalu otomatis mendaftarkan 7 akun Satpam resmi Universitas Widyagama Husada Malang. Lanjutkan?');" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="btn-sm-danger" style="padding: 10px 16px; font-size: 13px; border-radius: 8px;">
+                            🧹 Bersihkan Data Testing
+                        </button>
+                    </form>
+
+                    <button type="button" class="primary-button" id="btnOpenAddModal">
+                        + Tambah Petugas
+                    </button>
+                </div>
             </section>
 
             <!-- Search Bar Section -->
